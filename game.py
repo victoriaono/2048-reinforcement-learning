@@ -1,9 +1,10 @@
 import random
 import copy
+import numpy as np
 
 class Game2048():
     def __init__(self):
-        self.matrix = [[0,0,0,0] for _ in range(4)]
+        self.matrix = np.zeros((4,4))
         self.matrix[random.randint(0, 3)][random.randint(0, 3)] = random.choice([2, 4])
         self.game_end = False
         self.merge_score = 0
@@ -13,6 +14,9 @@ class Game2048():
         for row in self.matrix:
             output += str(row) + "\n"
         return output
+    
+    def reset(self):
+        self.__init__()
 
     def check_game(self):
         # If there is at least one empty square
@@ -30,7 +34,9 @@ class Game2048():
                     self.game_end = False         
                 if self.matrix[j][3] == self.matrix[j + 1][3]:     
                     self.game_end = False  
-
+    
+    def is_game_over(self):
+        return self.game_end
         
     def get_number(self):
         row, col = random.randint(0, 3), random.randint(0, 3)
@@ -46,7 +52,7 @@ class Game2048():
             for row in reversed(range(len(self.matrix[0]))):
                 temp.append(self.matrix[row][col])
             out.append(temp)
-        self.matrix = out
+        self.matrix = np.array(out)
 
     def double_rotate(self):
         for _ in range(2):
@@ -74,7 +80,7 @@ class Game2048():
                 else:
                     self.matrix[row][col] = 0
 
-        if matrix_copy != self.matrix:
+        if not (matrix_copy == self.matrix).all():
             self.get_number()       
         self.check_game()
 
@@ -100,13 +106,13 @@ class Game2048():
 
     def make_move(self, move):
         if move == 0:
-            self.move_up()        
+            self.move_left()        
         if move == 1:
-            self.move_down()
+            self.move_up()
         if move == 2:
-            self.move_left()
-        if move == 3:
             self.move_right()
+        if move == 3:
+            self.move_down()
 
     def get_sum(self):
         total_sum = 0
@@ -115,7 +121,7 @@ class Game2048():
         return total_sum
 
     def max_num(self):
-        return max(map(max, self.matrix))
+        return self.matrix.max()
 
     def get_merge_score(self):
         return self.merge_score
